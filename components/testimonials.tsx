@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion"
 import { Card, CardContent } from "@/components/ui/card"
-import { Avatar } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Star, Quote } from "lucide-react"
 import { useImprovedScrollAnimation } from "@/hooks/useImprovedScrollAnimation"
@@ -15,7 +14,6 @@ interface Testimonial {
   company: string
   content: string
   rating: number
-  avatar: string
   projectType: string
 }
 
@@ -28,7 +26,6 @@ const testimonials: Testimonial[] = [
     content:
       "Tyrone is an excellent technical Writer with english and spanish domain, capable to develope and maintain IT documentation, users guides and related activities.",
     rating: 5,
-    avatar: "/placeholder.svg?height=60&width=60",
     projectType: "Overall",
   },
   {
@@ -39,7 +36,6 @@ const testimonials: Testimonial[] = [
     content:
       "Tyrone demonstrated his skills as a top-notch technical writer, excellent communication, teamwork orientation, and proficiency in English.",
     rating: 5,
-    avatar: "/placeholder.svg?height=60&width=60",
     projectType: "Overall",
   },
   {
@@ -50,7 +46,6 @@ const testimonials: Testimonial[] = [
     content:
       "Tyrone and I worked together at Tradeview Markets, where he was responsible for documenting projects developed by the area's development team. I appreciated his meticulous approach to detailing technical documentation. His contribution was valuable to better understand the projects and facilitated collaboration on the team. greetings",
     rating: 5,
-    avatar: "/placeholder.svg?height=60&width=60",
     projectType: "Overall",
   },
   {
@@ -61,7 +56,6 @@ const testimonials: Testimonial[] = [
     content:
       "I had a fantastic experience with Tyrone. He is a professional as both an English tutor and a translator. His expertise and dedication truly stand out. I highly recommend his services to anyone looking to improve their English or needing high-quality translation work!",
     rating: 5,
-    avatar: "/placeholder.svg?height=60&width=60",
     projectType: "General Documentation",
   },
   {
@@ -72,7 +66,6 @@ const testimonials: Testimonial[] = [
     content:
       "The documentation standards and style guide Tyrone created for our client have improved consistency across all our technical content. His strategic approach to documentation has been invaluable.",
     rating: 5,
-    avatar: "/placeholder.svg?height=60&width=60",
     projectType: "Training Materials",
   },
   {
@@ -83,7 +76,6 @@ const testimonials: Testimonial[] = [
     content:
       "Tyrone's technical writing skills are top-notch. His work on our user guides, research schemas and tutorials has received overwhelmingly positive feedback. He has a talent for making complex workflows seem simple",
     rating: 5,
-    avatar: "/placeholder.svg?height=60&width=60",
     projectType: "Process Documentation, Research",
   },
 ]
@@ -127,13 +119,6 @@ export default function Testimonials() {
                   {/* Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center space-x-3">
-                      <Avatar className="h-12 w-12">
-                        <img
-                          src={testimonial.avatar || "/placeholder.svg"}
-                          alt={`${testimonial.name} avatar`}
-                          className="h-full w-full object-cover"
-                        />
-                      </Avatar>
                       <div>
                         <h4 className="font-semibold text-slate-900 dark:text-white">{testimonial.name}</h4>
                         <p className="text-sm text-slate-600 dark:text-slate-400">{testimonial.role}</p>
