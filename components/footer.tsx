@@ -32,9 +32,9 @@ export default function Footer() {
   ]
 
   const contactInfo = [
-    { icon: Mail, label: "tyrone@example.com", href: "mailto:tyrone@example.com" },
-    { icon: Phone, label: "+1 (234) 567-8900", href: "tel:+12345678900" },
-    { icon: MapPin, label: "Remote & On-site Available", href: null },
+    { icon: Mail, label: "steven.orrego93@gmail.com", href: "steven.orrego93@gmail.com" },
+    { icon: Phone, label: "+57 3024374193", href: "tel:+573024374193" },
+    { icon: MapPin, label: "Remote Available", href: null },
   ]
 
   const socialLinks = [
