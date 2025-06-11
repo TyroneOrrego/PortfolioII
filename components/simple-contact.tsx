@@ -60,10 +60,10 @@ export default function SimpleContact() {
                 <div>
                   <h4 className="font-semibold text-slate-900 dark:text-white">Email</h4>
                   <Link
-                    href="mailto:tyrone@example.com"
+                    href="mailto:steven.orrego93@gmail.com"
                     className="text-orange-600 dark:text-orange-400 hover:underline"
                   >
-                    tyrone@example.com
+                    steven.orrego93@gmail.com
                   </Link>
                 </div>
               </div>
@@ -75,7 +75,7 @@ export default function SimpleContact() {
                 <div>
                   <h4 className="font-semibold text-slate-900 dark:text-white">Phone</h4>
                   <Link href="tel:+1234567890" className="text-orange-600 dark:text-orange-400 hover:underline">
-                    +1 (234) 567-8900
+                    +57 3024374193
                   </Link>
                 </div>
               </div>
