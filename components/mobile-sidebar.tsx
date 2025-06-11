@@ -123,7 +123,7 @@ export default function MobileSidebar({ activeSection, onSectionChange }: Mobile
               {/* Footer */}
               <div className="absolute bottom-6 left-6 right-6">
                 <div className="text-center text-sm text-slate-500 dark:text-slate-400">
-                  <p>© 2024 Tyrone Orrego</p>
+                  <p>© 2025 Tyrone Orrego</p>
                   <p>Technical Writer</p>
                 </div>
               </div>
