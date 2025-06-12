@@ -24,7 +24,7 @@ export default function About() {
     },
     {
       icon: Users,
-      value: "25+",
+      value: "10+",
       label: "Happy Clients",
       description: "Startups to International Companies",
     },
