@@ -1,9 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Button } from "@/components/ui/button"
-import { ArrowDown, Download, Mail } from "lucide-react"
-import Link from "next/link"
+import { ArrowDown } from "lucide-react"
 import { useImprovedScrollAnimation } from "@/hooks/useImprovedScrollAnimation"
 
 export default function Hero() {
@@ -100,8 +98,7 @@ export default function Hero() {
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ duration: 0.8, delay: 0.6 }}
               className="flex flex-col sm:flex-row gap-4 justify-center items-center"
-            >
-            </motion.div>
+            ></motion.div>
           </motion.div>
 
           {/* Scroll Indicator */}
@@ -113,10 +110,10 @@ export default function Hero() {
           >
             <button
               onClick={() => scrollToSection("about")}
-              className="flex flex-col justify-center space-y-2 text-slate-400 hover:text-orange-500 transition-colors duration-300 group center justify-center"
+              className="flex flex-col items-center justify-center space-y-1 sm:space-y-2 text-slate-400 hover:text-orange-500 transition-colors duration-300 group"
               aria-label="Scroll to about section"
             >
-              <ArrowDown className="h-5 w-5 animate-bounce group-hover:text-orange-500" />
+              <ArrowDown className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 animate-bounce group-hover:text-orange-500" />
             </button>
           </motion.div>
         </div>

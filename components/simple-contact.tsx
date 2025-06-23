@@ -3,13 +3,7 @@
 import type React from "react"
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Mail, Phone, MapPin, Send, CheckCircle, AlertCircle } from "lucide-react"
+import { Mail, Phone, MapPin } from "lucide-react"
 import Link from "next/link"
 import { useImprovedScrollAnimation } from "@/hooks/useImprovedScrollAnimation"
 import { SectionHeader } from "@/components/ui/section-header"
@@ -52,41 +46,44 @@ export default function SimpleContact() {
             </div>
 
             {/* Contact Details */}
-            <div className="flex flex-col items-center space-y-6">
-              <div className="flex space-x-4">
-                <div className="flex-shrink-0 w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
-                  <Mail className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+            <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-8 sm:justify-center">
+              <div className="flex items-center space-x-3 sm:space-x-4">
+                <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
+                  <Mail className="h-5 w-5 sm:h-6 sm:w-6 text-orange-600 dark:text-orange-400" />
                 </div>
-                <div>
-                  <h4 className="font-semibold text-slate-900 dark:text-white">Email</h4>
+                <div className="min-w-0 flex-1">
+                  <h4 className="font-semibold text-slate-900 dark:text-white text-sm sm:text-base">Email</h4>
                   <Link
                     href="mailto:steven.orrego93@gmail.com"
-                    className="text-orange-600 dark:text-orange-400 hover:underline"
+                    className="text-orange-600 dark:text-orange-400 hover:underline text-sm sm:text-base break-all"
                   >
                     steven.orrego93@gmail.com
                   </Link>
                 </div>
               </div>
 
-              <div className="flex items-center space-x-4">
-                <div className="flex-shrink-0 w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
-                  <Phone className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+              <div className="flex items-center space-x-3 sm:space-x-4">
+                <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
+                  <Phone className="h-5 w-5 sm:h-6 sm:w-6 text-orange-600 dark:text-orange-400" />
                 </div>
-                <div>
-                  <h4 className="font-semibold text-slate-900 dark:text-white">Phone</h4>
-                  <Link href="tel:+1234567890" className="text-orange-600 dark:text-orange-400 hover:underline">
+                <div className="min-w-0 flex-1">
+                  <h4 className="font-semibold text-slate-900 dark:text-white text-sm sm:text-base">Phone</h4>
+                  <Link
+                    href="tel:+573024374193"
+                    className="text-orange-600 dark:text-orange-400 hover:underline text-sm sm:text-base"
+                  >
                     +57 3024374193
                   </Link>
                 </div>
               </div>
 
-              <div className="flex items-center space-x-4">
-                <div className="flex-shrink-0 w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
-                  <MapPin className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+              <div className="flex items-center space-x-3 sm:space-x-4">
+                <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
+                  <MapPin className="h-5 w-5 sm:h-6 sm:w-6 text-orange-600 dark:text-orange-400" />
                 </div>
-                <div>
-                  <h4 className="font-semibold text-slate-900 dark:text-white">Location</h4>
-                  <p className="text-slate-600 dark:text-slate-400">Remote</p>
+                <div className="min-w-0 flex-1">
+                  <h4 className="font-semibold text-slate-900 dark:text-white text-sm sm:text-base">Location</h4>
+                  <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base">Remote</p>
                 </div>
               </div>
             </div>
