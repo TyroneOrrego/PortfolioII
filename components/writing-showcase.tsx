@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Download, FileText, Star, Clock, HardDrive, TrendingUp, Search } from "lucide-react"
+import { Download, FileText, Star, Search } from "lucide-react"
 import Link from "next/link"
 import { useScrollAnimation } from "@/hooks/useScrollAnimation"
 
@@ -30,7 +30,7 @@ const writingSamples: WritingSample[] = [
       "Comprehensive guide for documenting REST APIs with interactive examples, best practices, and real-world case studies from enterprise implementations.",
     category: "API Documentation",
     difficulty: "Intermediate",
-    downloadUrl: "https://drive.google.com/file/d/194AWC9YHC48HdNUSfAuVkS-8AfKyD-wQ/view?usp=drive_link"
+    downloadUrl: "https://drive.google.com/file/d/194AWC9YHC48HdNUSfAuVkS-8AfKyD-wQ/view?usp=drive_link",
     tags: ["REST API", "OpenAPI", "Swagger", "Developer Tools", "Best Practices"],
     featured: true,
     lastUpdated: "2024-01-15",
@@ -62,8 +62,7 @@ const writingSamples: WritingSample[] = [
   {
     id: "Docs as Code",
     title: "Docs as Code made simple and approachable.",
-    description:
-      "Introduction to Docs-as-Code.",
+    description: "Introduction to Docs-as-Code.",
     category: "Techwitring ",
     difficulty: "Intermediate",
     downloadUrl: "https://drive.google.com/file/d/1DkQgkEYm1s6RYyCTFmx-Q4sr_w7U9ThF/view",
@@ -74,8 +73,7 @@ const writingSamples: WritingSample[] = [
   {
     id: "Starter Pack",
     title: "Technical Writing: Beginners Starter Pack",
-    description:
-      "Some tools and gadgets that every single TW should have in mind..",
+    description: "Some tools and gadgets that every single TW should have in mind..",
     category: "Tools & Technology",
     difficulty: "Beginner",
     downloadUrl: "https://drive.google.com/file/d/1_w5XBv6nJ55t1YnI25SiSepyQKR7u5rE/view",
