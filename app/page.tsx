@@ -1,99 +1,56 @@
 "use client"
 
-import { useEffect, Suspense } from "react"
+import { useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import dynamic from "next/dynamic"
 import Navbar from "@/components/navbar"
 import Hero from "@/components/hero"
-import MobileSidebar from "@/components/mobile-sidebar"
+import About from "@/components/about"
+import Skills from "@/components/skills"
+import Timeline from "@/components/timeline"
+import Projects from "@/components/projects"
+import WritingShowcase from "@/components/writing-showcase"
+import Testimonials from "@/components/testimonials"
+import SimpleContact from "@/components/simple-contact"
+import Footer from "@/components/footer"
 import { ErrorBoundary } from "@/components/error-boundary"
 import { useUI } from "@/contexts/ui-context"
 
-// Optimized dynamic imports with better loading states
-const About = dynamic(() => import("@/components/about"), {
-  loading: () => <div className="h-96 bg-white dark:bg-slate-950 animate-pulse" />,
-  ssr: true,
-})
-
-const Skills = dynamic(() => import("@/components/skills"), {
-  loading: () => <div className="h-96 bg-slate-50 dark:bg-slate-900 animate-pulse" />,
-  ssr: true,
-})
-
-const Timeline = dynamic(() => import("@/components/timeline"), {
-  loading: () => <div className="h-96 bg-white dark:bg-slate-950 animate-pulse" />,
-  ssr: true,
-})
-
-const Projects = dynamic(() => import("@/components/projects"), {
-  loading: () => <div className="h-96 bg-slate-50 dark:bg-slate-900 animate-pulse" />,
-  ssr: true,
-})
-
-const WritingShowcase = dynamic(() => import("@/components/writing-showcase"), {
-  loading: () => <div className="h-96 bg-white dark:bg-slate-950 animate-pulse" />,
-  ssr: true,
-})
-
-const Testimonials = dynamic(() => import("@/components/testimonials"), {
-  loading: () => <div className="h-96 bg-slate-50 dark:bg-slate-900 animate-pulse" />,
-  ssr: true,
-})
-
-const SimpleContact = dynamic(() => import("@/components/simple-contact"), {
-  loading: () => <div className="h-96 bg-slate-50 dark:bg-slate-900 animate-pulse" />,
-  ssr: true,
-})
-
-const Footer = dynamic(() => import("@/components/footer"), {
-  loading: () => <div className="h-32 bg-slate-900 animate-pulse" />,
-  ssr: true,
-})
+// Simple loading component
+const SectionLoader = ({ className }: { className: string }) => (
+  <div className={`animate-pulse ${className}`}>
+    <div className="container mx-auto px-4 py-12">
+      <div className="h-8 bg-slate-200 dark:bg-slate-700 rounded w-1/3 mx-auto mb-8" />
+      <div className="space-y-4">
+        <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4 mx-auto" />
+        <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/2 mx-auto" />
+      </div>
+    </div>
+  </div>
+)
 
 export default function Home() {
-  const { activeSection, setActiveSection } = useUI()
+  const { setActiveSection } = useUI()
 
-  // Optimized scroll handling with intersection observer
+  // Optimized intersection observer
   useEffect(() => {
     const sections = document.querySelectorAll("section[id]")
 
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
-            setActiveSection(entry.target.id)
-          }
-        })
+        const visibleEntry = entries.find((entry) => entry.isIntersecting && entry.intersectionRatio > 0.5)
+        if (visibleEntry) {
+          setActiveSection(visibleEntry.target.id)
+        }
       },
       {
-        threshold: [0.5],
-        rootMargin: "-80px 0px -80px 0px",
+        threshold: 0.5,
+        rootMargin: "-80px 0px",
       },
     )
 
     sections.forEach((section) => observer.observe(section))
-
-    return () => {
-      sections.forEach((section) => observer.unobserve(section))
-    }
+    return () => observer.disconnect()
   }, [setActiveSection])
-
-  // Preload critical resources
-  useEffect(() => {
-    const preloadLinks = [
-      "/examples/api-documentation-guide.pdf",
-      "/examples/technical-writing-interviews.pdf",
-      "/examples/single-sourcing-handbook.pdf",
-      "/cv/tyrone-orrego-cv.pdf",
-    ]
-
-    preloadLinks.forEach((href) => {
-      const link = document.createElement("link")
-      link.rel = "prefetch"
-      link.href = href
-      document.head.appendChild(link)
-    })
-  }, [])
 
   return (
     <AnimatePresence mode="wait">
@@ -101,70 +58,49 @@ export default function Home() {
         className="min-h-screen"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
       >
-        {/* Navigation */}
         <ErrorBoundary>
           <Navbar />
-          <MobileSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
         </ErrorBoundary>
 
-        {/* Main Content */}
         <main id="main-content" role="main">
           <ErrorBoundary>
             <Hero />
           </ErrorBoundary>
 
-          <Suspense fallback={<div className="h-96 bg-white animate-pulse" />}>
-            <ErrorBoundary>
-              <About />
-            </ErrorBoundary>
-          </Suspense>
+          <ErrorBoundary>
+            <About />
+          </ErrorBoundary>
 
-          <Suspense fallback={<div className="h-96 bg-slate-50 animate-pulse" />}>
-            <ErrorBoundary>
-              <Skills />
-            </ErrorBoundary>
-          </Suspense>
+          <ErrorBoundary>
+            <Skills />
+          </ErrorBoundary>
 
-          <Suspense fallback={<div className="h-96 bg-white animate-pulse" />}>
-            <ErrorBoundary>
-              <Timeline />
-            </ErrorBoundary>
-          </Suspense>
+          <ErrorBoundary>
+            <Timeline />
+          </ErrorBoundary>
 
-          <Suspense fallback={<div className="h-96 bg-slate-50 animate-pulse" />}>
-            <ErrorBoundary>
-              <Projects />
-            </ErrorBoundary>
-          </Suspense>
+          <ErrorBoundary>
+            <Projects />
+          </ErrorBoundary>
 
-          <Suspense fallback={<div className="h-96 bg-white animate-pulse" />}>
-            <ErrorBoundary>
-              <WritingShowcase />
-            </ErrorBoundary>
-          </Suspense>
+          <ErrorBoundary>
+            <WritingShowcase />
+          </ErrorBoundary>
 
-          <Suspense fallback={<div className="h-96 bg-slate-50 animate-pulse" />}>
-            <ErrorBoundary>
-              <Testimonials />
-            </ErrorBoundary>
-          </Suspense>
+          <ErrorBoundary>
+            <Testimonials />
+          </ErrorBoundary>
 
-          <Suspense fallback={<div className="h-96 bg-slate-50 animate-pulse" />}>
-            <ErrorBoundary>
-              <SimpleContact />
-            </ErrorBoundary>
-          </Suspense>
-        </main>
+          <ErrorBoundary>
+            <SimpleContact />
+          </ErrorBoundary>
 
-        {/* Footer */}
-        <Suspense fallback={<div className="h-32 bg-slate-900 animate-pulse" />}>
           <ErrorBoundary>
             <Footer />
           </ErrorBoundary>
-        </Suspense>
+        </main>
       </motion.div>
     </AnimatePresence>
   )

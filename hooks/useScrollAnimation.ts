@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState, useEffect } from "react"
+import { useRef, useState, useEffect, useCallback } from "react"
 
 interface UseScrollAnimationOptions {
   threshold?: number
@@ -15,37 +15,40 @@ export function useScrollAnimation({
 }: UseScrollAnimationOptions = {}) {
   const ref = useRef<HTMLDivElement>(null)
   const [isInView, setIsInView] = useState(false)
+  const observerRef = useRef<IntersectionObserver | null>(null)
+
+  const handleIntersection = useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      const [entry] = entries
+      if (entry.isIntersecting) {
+        setIsInView(true)
+        if (once && observerRef.current) {
+          observerRef.current.disconnect()
+        }
+      } else if (!once) {
+        setIsInView(false)
+      }
+    },
+    [once],
+  )
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const [entry] = entries
-        if (entry.isIntersecting) {
-          setIsInView(true)
-          if (once) {
-            observer.disconnect()
-          }
-        } else if (!once) {
-          setIsInView(false)
-        }
-      },
-      {
-        threshold,
-        rootMargin,
-      },
-    )
-
     const currentRef = ref.current
-    if (currentRef) {
-      observer.observe(currentRef)
-    }
+    if (!currentRef) return
+
+    observerRef.current = new IntersectionObserver(handleIntersection, {
+      threshold,
+      rootMargin,
+    })
+
+    observerRef.current.observe(currentRef)
 
     return () => {
-      if (currentRef) {
-        observer.unobserve(currentRef)
+      if (observerRef.current) {
+        observerRef.current.disconnect()
       }
     }
-  }, [threshold, once, rootMargin])
+  }, [threshold, rootMargin, handleIntersection])
 
   return { ref, isInView }
 }

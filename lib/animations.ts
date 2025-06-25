@@ -1,158 +1,167 @@
 "use client"
 
+import { useEffect, useState, useMemo } from "react"
 import type { Variants } from "framer-motion"
 
 // Check if the user prefers reduced motion
-export const shouldReduceMotion =
-  typeof window !== "undefined" ? window.matchMedia("(prefers-reduced-motion: reduce)").matches : false
+export function usePrefersReducedMotion() {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
 
-// Fade in animation (subtle)
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)")
+    setPrefersReducedMotion(mediaQuery.matches)
+
+    const handleChange = () => setPrefersReducedMotion(mediaQuery.matches)
+    mediaQuery.addEventListener("change", handleChange)
+
+    return () => mediaQuery.removeEventListener("change", handleChange)
+  }, [])
+
+  return prefersReducedMotion
+}
+
+// Base animation variants - exported individually
 export const fadeIn: Variants = {
-  hidden: {
-    opacity: 0,
-    y: shouldReduceMotion ? 0 : 10,
-  },
+  hidden: { opacity: 0, y: 10 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: {
-      duration: 0.5,
-      ease: "easeOut",
-    },
+    transition: { duration: 0.5, ease: "easeOut" },
   },
 }
 
-// Fade up animation
 export const fadeUp: Variants = {
-  hidden: {
-    opacity: 0,
-    y: shouldReduceMotion ? 0 : 30,
-  },
+  hidden: { opacity: 0, y: 30 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: {
-      duration: 0.6,
-      ease: "easeOut",
-    },
+    transition: { duration: 0.6, ease: "easeOut" },
   },
 }
 
-// Staggered children animation
 export const staggerContainer: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: shouldReduceMotion ? 0 : 0.1,
+      staggerChildren: 0.1,
       delayChildren: 0.1,
     },
   },
 }
 
-// Scale animation for cards and interactive elements
-export const scaleUp: Variants = {
-  hidden: {
-    opacity: 0,
-    scale: shouldReduceMotion ? 1 : 0.95,
-  },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: {
-      duration: 0.4,
-      ease: "easeOut",
-    },
-  },
-}
-
-// Slide in from left
 export const slideInLeft: Variants = {
-  hidden: {
-    opacity: 0,
-    x: shouldReduceMotion ? 0 : -30,
-  },
+  hidden: { opacity: 0, x: -30 },
   visible: {
     opacity: 1,
     x: 0,
-    transition: {
-      duration: 0.6,
-      ease: "easeOut",
-    },
+    transition: { duration: 0.6, ease: "easeOut" },
   },
 }
 
-// Slide in from right
 export const slideInRight: Variants = {
-  hidden: {
-    opacity: 0,
-    x: shouldReduceMotion ? 0 : 30,
-  },
+  hidden: { opacity: 0, x: 30 },
   visible: {
     opacity: 1,
     x: 0,
-    transition: {
-      duration: 0.6,
-      ease: "easeOut",
-    },
+    transition: { duration: 0.6, ease: "easeOut" },
   },
 }
 
-// Animation for the navbar
-export const navAnimation: Variants = {
-  hidden: {
-    opacity: 0,
-    y: shouldReduceMotion ? 0 : -20,
-  },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.4,
-      ease: "easeOut",
-    },
-  },
-}
+// Hook to get optimized animations based on device and preferences
+export function useAnimations() {
+  const prefersReducedMotion = usePrefersReducedMotion()
+  const [isMobile, setIsMobile] = useState(false)
 
-// Animation for the mobile menu - updated for full-screen
-export const mobileMenuAnimation: Variants = {
-  hidden: {
-    opacity: 0,
-    scale: 0.95,
-  },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: {
-      duration: 0.3,
-      ease: [0.25, 0.1, 0.25, 1.0], // cubic-bezier
-    },
-  },
-  exit: {
-    opacity: 0,
-    scale: 0.95,
-    transition: {
-      duration: 0.2,
-      ease: [0.25, 0.1, 0.25, 1.0],
-    },
-  },
-}
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
 
-// Animation for the mobile menu backdrop
-export const backdropAnimation: Variants = {
-  hidden: {
-    opacity: 0,
-  },
-  visible: {
-    opacity: 1,
-    transition: {
-      duration: 0.3,
-    },
-  },
-  exit: {
-    opacity: 0,
-    transition: {
-      duration: 0.2,
-    },
-  },
+    const handleResize = () => checkMobile()
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
+
+  return useMemo(() => {
+    // If user prefers reduced motion, return simplified animations
+    if (prefersReducedMotion) {
+      return {
+        fadeIn: {
+          hidden: { opacity: 0 },
+          visible: { opacity: 1, transition: { duration: 0.3 } },
+        } as Variants,
+        fadeUp: {
+          hidden: { opacity: 0 },
+          visible: { opacity: 1, transition: { duration: 0.3 } },
+        } as Variants,
+        staggerContainer: {
+          hidden: { opacity: 0 },
+          visible: {
+            opacity: 1,
+            transition: { staggerChildren: 0, delayChildren: 0 },
+          },
+        } as Variants,
+        slideInLeft: {
+          hidden: { opacity: 0 },
+          visible: { opacity: 1, transition: { duration: 0.3 } },
+        } as Variants,
+        slideInRight: {
+          hidden: { opacity: 0 },
+          visible: { opacity: 1, transition: { duration: 0.3 } },
+        } as Variants,
+        isMobile,
+        prefersReducedMotion,
+      }
+    }
+
+    // Return standard animations with adjusted timing for mobile
+    const duration = isMobile ? 0.4 : 0.6
+
+    return {
+      fadeIn: {
+        hidden: { opacity: 0, y: isMobile ? 5 : 10 },
+        visible: {
+          opacity: 1,
+          y: 0,
+          transition: { duration: duration * 0.8, ease: "easeOut" },
+        },
+      } as Variants,
+      fadeUp: {
+        hidden: { opacity: 0, y: isMobile ? 15 : 30 },
+        visible: {
+          opacity: 1,
+          y: 0,
+          transition: { duration, ease: "easeOut" },
+        },
+      } as Variants,
+      staggerContainer: {
+        hidden: { opacity: 0 },
+        visible: {
+          opacity: 1,
+          transition: {
+            staggerChildren: isMobile ? 0.05 : 0.1,
+            delayChildren: isMobile ? 0.05 : 0.1,
+          },
+        },
+      } as Variants,
+      slideInLeft: {
+        hidden: { opacity: 0, x: isMobile ? -15 : -30 },
+        visible: {
+          opacity: 1,
+          x: 0,
+          transition: { duration, ease: "easeOut" },
+        },
+      } as Variants,
+      slideInRight: {
+        hidden: { opacity: 0, x: isMobile ? 15 : 30 },
+        visible: {
+          opacity: 1,
+          x: 0,
+          transition: { duration, ease: "easeOut" },
+        },
+      } as Variants,
+      isMobile,
+      prefersReducedMotion,
+    }
+  }, [prefersReducedMotion, isMobile])
 }

@@ -17,7 +17,7 @@ import { motion } from "framer-motion"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useScrollAnimation } from "@/hooks/useScrollAnimation"
-import { useAnimations } from "@/lib/animation"
+import { useAnimations } from "@/lib/animations"
 
 export default function Skills() {
   const { ref: skillsRef, isInView: skillsInView } = useScrollAnimation({ threshold: 0.1 })

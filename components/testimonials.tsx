@@ -4,8 +4,7 @@ import { motion } from "framer-motion"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Star, Quote } from "lucide-react"
-import { useImprovedScrollAnimation } from "@/hooks/useImprovedScrollAnimation"
-import { SectionHeader } from "@/components/ui/section-header"
+import { useScrollAnimation } from "@/hooks/useScrollAnimation"
 
 interface Testimonial {
   id: string
@@ -81,7 +80,7 @@ const testimonials: Testimonial[] = [
 ]
 
 export default function Testimonials() {
-  const { ref, isInView } = useImprovedScrollAnimation({
+  const { ref, isInView } = useScrollAnimation({
     threshold: 0.1,
     once: true,
   })
@@ -100,10 +99,18 @@ export default function Testimonials() {
   return (
     <section id="testimonials" className="py-12 md:py-24 bg-slate-50 dark:bg-slate-900" ref={ref}>
       <div className="container mx-auto px-4">
-        <SectionHeader
-          title="Client Testimonials"
-          description="What clients say about working with me and the impact of quality technical documentation."
-        />
+        <motion.div
+          className="flex flex-col items-center mb-12"
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.6 }}
+        >
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl mb-4">Client Testimonials</h2>
+          <div className="h-1 w-20 bg-gray-800 rounded mb-8"></div>
+          <p className="text-lg text-center max-w-3xl text-slate-700 dark:text-slate-300">
+            What clients say about working with me and the impact of quality technical documentation.
+          </p>
+        </motion.div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {testimonials.map((testimonial, index) => (

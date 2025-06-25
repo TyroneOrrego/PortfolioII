@@ -6,14 +6,16 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { FileText, Users, Award, TrendingUp, Download, Mail } from "lucide-react"
 import Link from "next/link"
-import { useImprovedScrollAnimation } from "@/hooks/useImprovedScrollAnimation"
-import { SectionHeader } from "@/components/ui/section-header"
+import { useScrollAnimation } from "@/hooks/useScrollAnimation"
+import { useAnimations } from "@/lib/animations"
 
 export default function About() {
-  const { ref, isInView } = useImprovedScrollAnimation({
+  const { ref, isInView } = useScrollAnimation({
     threshold: 0.1,
     once: true,
   })
+
+  const { fadeIn, fadeUp, staggerContainer } = useAnimations()
 
   const achievements = [
     {
@@ -56,10 +58,20 @@ export default function About() {
   return (
     <section id="about" className="py-12 md:py-24 bg-white dark:bg-slate-950" ref={ref}>
       <div className="container mx-auto px-4">
-        <SectionHeader
-          title="About Me"
-          description="Passionate about transforming complex technical concepts into clear, actionable documentation."
-        />
+        <motion.div
+          className="flex flex-col items-center mb-12"
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+          variants={staggerContainer}
+        >
+          <motion.h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl mb-4" variants={fadeUp}>
+            About Me
+          </motion.h2>
+          <motion.div className="h-1 w-20 bg-gray-800 rounded mb-8" variants={fadeIn}></motion.div>
+          <motion.p className="text-lg text-center max-w-3xl text-slate-700 dark:text-slate-300" variants={fadeUp}>
+            Passionate about transforming complex technical concepts into clear, actionable documentation.
+          </motion.p>
+        </motion.div>
 
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Content */}
@@ -114,11 +126,17 @@ export default function About() {
               transition={{ duration: 0.6, delay: 0.6 }}
               className="flex flex-col sm:flex-row gap-4 pt-4"
             >
-              <Button asChild className="bg-orange-500 hover:bg-orange-600 text-white font-semibold">
-                <Link href="#contact" className="flex items-center space-x-2">
-                  <Mail className="h-4 w-4" />
-                  <span>Let's Work Together</span>
-                </Link>
+              <Button
+                onClick={() => {
+                  const element = document.getElementById("contact")
+                  if (element) {
+                    element.scrollIntoView({ behavior: "smooth" })
+                  }
+                }}
+                className="bg-orange-500 hover:bg-orange-600 text-white font-semibold"
+              >
+                <Mail className="h-4 w-4 mr-2" />
+                Let's Work Together
               </Button>
               <Button
                 asChild

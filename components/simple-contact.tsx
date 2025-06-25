@@ -5,13 +5,12 @@ import { useState } from "react"
 import { motion } from "framer-motion"
 import { Mail, Phone, MapPin } from "lucide-react"
 import Link from "next/link"
-import { useImprovedScrollAnimation } from "@/hooks/useImprovedScrollAnimation"
-import { SectionHeader } from "@/components/ui/section-header"
+import { useScrollAnimation } from "@/hooks/useScrollAnimation"
 
 export default function SimpleContact() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const { ref, isInView } = useImprovedScrollAnimation({
+  const { ref, isInView } = useScrollAnimation({
     threshold: 0.1,
     once: true,
   })
@@ -24,10 +23,18 @@ export default function SimpleContact() {
   return (
     <section id="contact" className="py-12 md:py-24 bg-slate-50 dark:bg-slate-900" ref={ref}>
       <div className="container mx-auto px-4 items-center text-center">
-        <SectionHeader
-          title="Let's Work Together"
-          description="Ready to transform your technical documentation? Get in touch to discuss your project."
-        />
+        <motion.div
+          className="flex flex-col items-center mb-12"
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.6 }}
+        >
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl mb-4">Let's Work Together</h2>
+          <div className="h-1 w-20 bg-gray-800 rounded mb-8"></div>
+          <p className="text-lg text-center max-w-3xl text-slate-700 dark:text-slate-300">
+            Ready to transform your technical documentation? Get in touch to discuss your project.
+          </p>
+        </motion.div>
 
         <div className="text-center lg:grid-cols-2 content:justify gap-12 max-w-6xl mx-auto">
           {/* Contact Information */}

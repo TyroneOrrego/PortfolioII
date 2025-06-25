@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react"
 
 interface UIContextType {
   activeSection: string
@@ -14,103 +14,77 @@ interface UIContextType {
 const UIContext = createContext<UIContextType | undefined>(undefined)
 
 export function UIProvider({ children }: { children: ReactNode }) {
-  const [activeSection, setActiveSection] = useState("home")
+  const [activeSection, setActiveSection] = useState("hero")
   const [isTopOfPage, setIsTopOfPage] = useState(true)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
-  const toggleMenu = () => setIsMenuOpen((prev) => !prev)
+  const toggleMenu = useCallback(() => setIsMenuOpen((prev) => !prev), [])
 
-  // Enhanced scroll detection with performance optimization
+  // Optimized scroll handler with throttling
   useEffect(() => {
     let ticking = false
-    let lastScrollY = 0
 
     const handleScroll = () => {
-      const currentScrollY = window.scrollY
-
-      // Update isTopOfPage with hysteresis to prevent flickering
-      setIsTopOfPage(currentScrollY < 50)
-
-      // Determine active section based on scroll position with improved logic
-      const sections = [
-        "home",
-        "about",
-        "skills",
-        "experience",
-        "projects",
-        "writing-examples",
-        "testimonials",
-        "contact",
-      ]
-
-      // Find the section that's most visible in the viewport
-      let activeSection = "home"
-      let maxVisibility = 0
-
-      for (const section of sections) {
-        const element = document.getElementById(section)
-        if (element) {
-          const rect = element.getBoundingClientRect()
-          const viewportHeight = window.innerHeight
-
-          // Calculate how much of the section is visible
-          const visibleTop = Math.max(0, Math.min(rect.bottom, viewportHeight) - Math.max(rect.top, 0))
-          const visibility = visibleTop / viewportHeight
-
-          if (visibility > maxVisibility && rect.top < viewportHeight * 0.5) {
-            maxVisibility = visibility
-            activeSection = section
-          }
-        }
-      }
-
-      setActiveSection(activeSection)
-      lastScrollY = currentScrollY
-    }
-
-    const throttledHandleScroll = () => {
       if (!ticking) {
-        window.requestAnimationFrame(() => {
-          handleScroll()
+        requestAnimationFrame(() => {
+          const scrollY = window.scrollY
+          setIsTopOfPage(scrollY < 50)
+
+          // Simplified section detection
+          const sections = [
+            "hero",
+            "about",
+            "skills",
+            "experience",
+            "projects",
+            "writing-examples",
+            "testimonials",
+            "contact",
+          ]
+
+          for (const section of sections) {
+            const element = document.getElementById(section)
+            if (element) {
+              const rect = element.getBoundingClientRect()
+              if (rect.top <= 100 && rect.bottom >= 100) {
+                setActiveSection(section)
+                break
+              }
+            }
+          }
+
           ticking = false
         })
         ticking = true
       }
     }
 
-    // Use passive listener for better performance
-    window.addEventListener("scroll", throttledHandleScroll, { passive: true })
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    handleScroll() // Initial check
 
-    // Initial check
-    handleScroll()
-
-    return () => window.removeEventListener("scroll", throttledHandleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  // Enhanced body scroll lock with better mobile support
+  // Optimized body scroll lock
   useEffect(() => {
     if (isMenuOpen) {
       const scrollY = window.scrollY
-      document.body.style.position = "fixed"
-      document.body.style.top = `-${scrollY}px`
-      document.body.style.width = "100%"
-      document.body.classList.add("mobile-menu-open")
+      document.body.style.cssText = `
+        position: fixed;
+        top: -${scrollY}px;
+        width: 100%;
+        overflow: hidden;
+      `
     } else {
       const scrollY = document.body.style.top
-      document.body.style.position = ""
-      document.body.style.top = ""
-      document.body.style.width = ""
-      document.body.classList.remove("mobile-menu-open")
+      document.body.style.cssText = ""
       if (scrollY) {
         window.scrollTo(0, Number.parseInt(scrollY || "0") * -1)
       }
     }
 
     return () => {
-      document.body.style.position = ""
-      document.body.style.top = ""
-      document.body.style.width = ""
-      document.body.classList.remove("mobile-menu-open")
+      document.body.style.cssText = ""
     }
   }, [isMenuOpen])
 
