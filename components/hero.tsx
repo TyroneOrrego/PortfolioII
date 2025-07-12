@@ -1,22 +1,153 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { useEffect, useRef } from "react"
+import { gsap } from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { Sparkles, Award, Users, FileText } from "lucide-react"
-import { useScrollAnimation } from "@/hooks/useScrollAnimation"
 import { Button } from "@/components/ui/button"
+import { smoothScrollTo } from "@/lib/gsap-animations"
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger)
+}
 
 export default function Hero() {
-  const { ref, isInView } = useScrollAnimation({
-    threshold: 0.3,
-    once: true,
-  })
+  const heroRef = useRef<HTMLDivElement>(null)
+  const titleRef = useRef<HTMLHeadingElement>(null)
+  const subtitleRef = useRef<HTMLParagraphElement>(null)
+  const buttonsRef = useRef<HTMLDivElement>(null)
+  const statsRef = useRef<HTMLDivElement>(null)
+  const trustRef = useRef<HTMLDivElement>(null)
 
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId)
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" })
-    }
-  }
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Set initial states - ensure content is visible by default
+      gsap.set([titleRef.current, subtitleRef.current, buttonsRef.current, statsRef.current, trustRef.current], {
+        opacity: 1,
+        y: 0,
+      })
+
+      // Create main timeline with subtle animations
+      const tl = gsap.timeline({ delay: 0.2 })
+
+      // Animate title
+      tl.fromTo(
+        titleRef.current,
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          ease: "power3.out",
+        },
+      )
+        .fromTo(
+          subtitleRef.current,
+          { opacity: 0, y: 20 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power2.out",
+          },
+          "-=0.6",
+        )
+        .fromTo(
+          buttonsRef.current,
+          { opacity: 0, y: 20 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power2.out",
+          },
+          "-=0.4",
+        )
+        .fromTo(
+          statsRef.current,
+          { opacity: 0, y: 30 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            ease: "power2.out",
+          },
+          "-=0.2",
+        )
+        .fromTo(
+          trustRef.current,
+          { opacity: 0, y: 20 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power2.out",
+          },
+          "-=0.4",
+        )
+
+      // Animate stats cards with stagger
+      gsap.fromTo(
+        ".stat-card",
+        {
+          opacity: 0,
+          y: 30,
+          scale: 0.9,
+        },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.8,
+          ease: "back.out(1.7)",
+          stagger: 0.15,
+          delay: 1.5,
+        },
+      )
+
+      // Animate trust indicators
+      gsap.fromTo(
+        ".trust-item",
+        {
+          opacity: 0,
+          x: -20,
+        },
+        {
+          opacity: 1,
+          x: 0,
+          duration: 0.6,
+          ease: "power2.out",
+          stagger: 0.1,
+          delay: 2,
+        },
+      )
+
+      // Subtle parallax effect for background elements
+      gsap.to(".bg-element-1", {
+        y: -50,
+        ease: "none",
+        scrollTrigger: {
+          trigger: heroRef.current,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1,
+        },
+      })
+
+      gsap.to(".bg-element-2", {
+        y: -80,
+        ease: "none",
+        scrollTrigger: {
+          trigger: heroRef.current,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1.5,
+        },
+      })
+    }, heroRef)
+
+    return () => ctx.revert()
+  }, [])
 
   const stats = [
     { icon: FileText, value: "60+", label: "Projects Completed" },
@@ -27,16 +158,16 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      ref={ref}
+      ref={heroRef}
       className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white via-slate-50 to-orange-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900/50 relative overflow-hidden pt-16 sm:pt-20"
     >
-      {/* Simplified Background Elements */}
+      {/* Background Elements */}
       <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-20 left-10 w-64 h-64 bg-orange-200/40 dark:bg-orange-900/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 right-10 w-80 h-80 bg-blue-200/30 dark:bg-blue-900/15 rounded-full blur-3xl" />
+        <div className="bg-element-1 absolute top-20 left-10 w-64 h-64 bg-orange-200/40 dark:bg-orange-900/20 rounded-full blur-3xl" />
+        <div className="bg-element-2 absolute bottom-20 right-10 w-80 h-80 bg-blue-200/30 dark:bg-blue-900/15 rounded-full blur-3xl" />
       </div>
 
-      {/* Subtle Grid Pattern */}
+      {/* Grid Pattern */}
       <div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05]">
         <div
           className="w-full h-full"
@@ -49,20 +180,13 @@ export default function Hero() {
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="max-w-6xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="text-center space-y-6 sm:space-y-8"
-          >
+          <div className="text-center space-y-6 sm:space-y-8">
             {/* Main Heading */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="space-y-4"
-            >
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-slate-900 dark:text-white leading-tight sm:leading-[1.1] tracking-tight px-2 sm:px-0">
+            <div className="space-y-4">
+              <h1
+                ref={titleRef}
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-slate-900 dark:text-white leading-tight sm:leading-[1.1] tracking-tight px-2 sm:px-0"
+              >
                 <span className="block sm:inline">Technical Writer</span>
                 <span className="block sm:inline"> & </span>
                 <span className="text-orange-500 relative block sm:inline">
@@ -83,13 +207,11 @@ export default function Hero() {
                 </span>
                 <span className="block sm:inline"> Expert</span>
               </h1>
-            </motion.div>
+            </div>
 
             {/* Subtitle */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
+            <p
+              ref={subtitleRef}
               className="text-base sm:text-lg md:text-xl lg:text-2xl text-slate-600 dark:text-slate-300 max-w-4xl mx-auto leading-relaxed font-light px-4"
             >
               Transforming complex technical concepts into{" "}
@@ -97,17 +219,15 @@ export default function Hero() {
                 clear, user-friendly documentation
               </span>{" "}
               that drives adoption and reduces support overhead.
-            </motion.p>
+            </p>
 
             {/* CTA Buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
+            <div
+              ref={buttonsRef}
               className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center pt-4 px-4"
             >
               <Button
-                onClick={() => scrollToSection("projects")}
+                onClick={() => smoothScrollTo("projects")}
                 size="lg"
                 className="w-full sm:w-auto bg-orange-500 hover:bg-orange-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-full"
               >
@@ -115,32 +235,21 @@ export default function Hero() {
                 View My Work
               </Button>
               <Button
-                onClick={() => scrollToSection("contact")}
+                onClick={() => smoothScrollTo("contact")}
                 variant="outline"
                 size="lg"
                 className="w-full sm:w-auto border-2 border-slate-300 text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-full"
               >
                 Let's Talk
               </Button>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
 
           {/* Stats Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-            className="mt-16 sm:mt-20 lg:mt-24 px-4"
-          >
+          <div ref={statsRef} className="mt-16 sm:mt-20 lg:mt-24 px-4">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 max-w-4xl mx-auto">
               {stats.map((stat, index) => (
-                <motion.div
-                  key={stat.label}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                  transition={{ duration: 0.6, delay: 0.6 + index * 0.1 }}
-                  className="text-center group"
-                >
+                <div key={stat.label} className="text-center group stat-card">
                   <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-slate-200/50 dark:border-slate-700/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                     <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 bg-orange-100 dark:bg-orange-900/30 rounded-xl mb-3 sm:mb-4 group-hover:scale-110 transition-transform duration-300">
                       <stat.icon className="h-5 w-5 sm:h-6 sm:w-6 text-orange-600 dark:text-orange-400" />
@@ -152,35 +261,27 @@ export default function Hero() {
                       {stat.label}
                     </div>
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
-          </motion.div>
+          </div>
 
           {/* Trust Indicators */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 1, delay: 0.9 }}
-            className="mt-12 sm:mt-16 text-center px-4"
-          >
+          <div ref={trustRef} className="mt-12 sm:mt-16 text-center px-4">
             <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-3 sm:mb-4">
               Trusted by companies worldwide
             </p>
             <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-6 lg:gap-8 opacity-60">
               {["Tradeview Markets", "SupportYourApp", "FloWater", "Valiant Migration"].map((company, index) => (
-                <motion.div
+                <div
                   key={company}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
-                  transition={{ duration: 0.5, delay: 1.1 + index * 0.1 }}
-                  className="text-slate-400 dark:text-slate-500 font-medium text-xs sm:text-sm hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-default"
+                  className="trust-item text-slate-400 dark:text-slate-500 font-medium text-xs sm:text-sm hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-default"
                 >
                   {company}
-                </motion.div>
+                </div>
               ))}
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

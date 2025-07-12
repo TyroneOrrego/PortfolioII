@@ -1,21 +1,125 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { useEffect, useRef } from "react"
+import { gsap } from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { FileText, Users, Award, TrendingUp, Download, Mail } from "lucide-react"
 import Link from "next/link"
-import { useScrollAnimation } from "@/hooks/useScrollAnimation"
-import { useAnimations } from "@/lib/animations"
+import { smoothScrollTo } from "@/lib/gsap-animations"
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger)
+}
 
 export default function About() {
-  const { ref, isInView } = useScrollAnimation({
-    threshold: 0.1,
-    once: true,
-  })
+  const sectionRef = useRef<HTMLDivElement>(null)
+  const headerRef = useRef<HTMLDivElement>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
+  const achievementsRef = useRef<HTMLDivElement>(null)
 
-  const { fadeIn, fadeUp, staggerContainer } = useAnimations()
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Header animation
+      gsap.fromTo(
+        headerRef.current,
+        { opacity: 0, y: 50 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 80%",
+            once: true,
+          },
+        },
+      )
+
+      // Content animation
+      gsap.fromTo(
+        contentRef.current,
+        { opacity: 0, x: -50 },
+        {
+          opacity: 1,
+          x: 0,
+          duration: 1,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: contentRef.current,
+            start: "top 80%",
+            once: true,
+          },
+        },
+      )
+
+      // Achievements grid animation
+      gsap.fromTo(
+        achievementsRef.current,
+        { opacity: 0, x: 50 },
+        {
+          opacity: 1,
+          x: 0,
+          duration: 1,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: achievementsRef.current,
+            start: "top 80%",
+            once: true,
+          },
+        },
+      )
+
+      // Achievement cards stagger animation
+      gsap.fromTo(
+        ".achievement-card",
+        {
+          opacity: 0,
+          y: 30,
+          scale: 0.9,
+        },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.8,
+          ease: "back.out(1.7)",
+          stagger: 0.15,
+          scrollTrigger: {
+            trigger: achievementsRef.current,
+            start: "top 70%",
+            once: true,
+          },
+        },
+      )
+
+      // Expertise badges animation
+      gsap.fromTo(
+        ".expertise-badge",
+        {
+          opacity: 0,
+          scale: 0.8,
+        },
+        {
+          opacity: 1,
+          scale: 1,
+          duration: 0.5,
+          ease: "back.out(1.7)",
+          stagger: 0.05,
+          scrollTrigger: {
+            trigger: ".expertise-container",
+            start: "top 80%",
+            once: true,
+          },
+        },
+      )
+    }, sectionRef)
+
+    return () => ctx.revert()
+  }, [])
 
   const achievements = [
     {
@@ -56,31 +160,19 @@ export default function About() {
   ]
 
   return (
-    <section id="about" className="py-12 md:py-24 bg-white dark:bg-slate-950" ref={ref}>
+    <section id="about" className="py-12 md:py-24 bg-white dark:bg-slate-950" ref={sectionRef}>
       <div className="container mx-auto px-4">
-        <motion.div
-          className="flex flex-col items-center mb-12"
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-          variants={staggerContainer}
-        >
-          <motion.h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl mb-4" variants={fadeUp}>
-            About Me
-          </motion.h2>
-          <motion.div className="h-1 w-20 bg-gray-800 rounded mb-8" variants={fadeIn}></motion.div>
-          <motion.p className="text-lg text-center max-w-3xl text-slate-700 dark:text-slate-300" variants={fadeUp}>
+        <div ref={headerRef} className="flex flex-col items-center mb-12">
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl mb-4">About Me</h2>
+          <div className="h-1 w-20 bg-gray-800 rounded mb-8"></div>
+          <p className="text-lg text-center max-w-3xl text-slate-700 dark:text-slate-300">
             Passionate about transforming complex technical concepts into clear, actionable documentation.
-          </motion.p>
-        </motion.div>
+          </p>
+        </div>
 
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Content */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="space-y-6"
-          >
+          <div ref={contentRef} className="space-y-6">
             <div className="space-y-4">
               <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
                 Bridging the Gap Between Technology and Understanding
@@ -98,41 +190,25 @@ export default function About() {
             </div>
 
             {/* Expertise Tags */}
-            <div>
+            <div className="expertise-container">
               <h4 className="text-lg font-semibold text-slate-900 dark:text-white mb-3">Areas of Expertise</h4>
               <div className="flex flex-wrap gap-2">
                 {expertise.map((skill, index) => (
-                  <motion.div
+                  <Badge
                     key={skill}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
-                    transition={{ duration: 0.3, delay: 0.4 + index * 0.05 }}
+                    variant="secondary"
+                    className="expertise-badge bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300 hover:bg-orange-200 dark:hover:bg-orange-900/50 transition-colors"
                   >
-                    <Badge
-                      variant="secondary"
-                      className="bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300 hover:bg-orange-200 dark:hover:bg-orange-900/50 transition-colors"
-                    >
-                      {skill}
-                    </Badge>
-                  </motion.div>
+                    {skill}
+                  </Badge>
                 ))}
               </div>
             </div>
 
             {/* CTA Buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.6, delay: 0.6 }}
-              className="flex flex-col sm:flex-row gap-4 pt-4"
-            >
+            <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Button
-                onClick={() => {
-                  const element = document.getElementById("contact")
-                  if (element) {
-                    element.scrollIntoView({ behavior: "smooth" })
-                  }
-                }}
+                onClick={() => smoothScrollTo("contact")}
                 className="bg-orange-500 hover:bg-orange-600 text-white font-semibold"
               >
                 <Mail className="h-4 w-4 mr-2" />
@@ -153,24 +229,13 @@ export default function About() {
                   <span>Download CV</span>
                 </Link>
               </Button>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
 
           {/* Achievements Grid */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 30 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="grid sm:grid-cols-2 gap-6"
-          >
+          <div ref={achievementsRef} className="grid sm:grid-cols-2 gap-6">
             {achievements.map((achievement, index) => (
-              <motion.div
-                key={achievement.label}
-                initial={{ opacity: 0, y: 30 }}
-                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-                transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
-                whileHover={{ y: -5, transition: { duration: 0.2 } }}
-              >
+              <div key={achievement.label} className="achievement-card">
                 <Card className="h-full hover:shadow-lg transition-all duration-300 border-0 shadow-md">
                   <CardContent className="p-6 text-center">
                     <div className="inline-flex items-center justify-center w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-lg mb-4">
@@ -181,9 +246,9 @@ export default function About() {
                     <div className="text-sm text-slate-500 dark:text-slate-400">{achievement.description}</div>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

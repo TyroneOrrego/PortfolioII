@@ -1,7 +1,8 @@
 "use client"
 
 import { useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { gsap } from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
 import Navbar from "@/components/navbar"
 import Hero from "@/components/hero"
 import About from "@/components/about"
@@ -14,25 +15,20 @@ import SimpleContact from "@/components/simple-contact"
 import Footer from "@/components/footer"
 import { ErrorBoundary } from "@/components/error-boundary"
 import { useUI } from "@/contexts/ui-context"
+import { pageTransitions } from "@/lib/gsap-animations"
 
-// Simple loading component
-const SectionLoader = ({ className }: { className: string }) => (
-  <div className={`animate-pulse ${className}`}>
-    <div className="container mx-auto px-4 py-12">
-      <div className="h-8 bg-slate-200 dark:bg-slate-700 rounded w-1/3 mx-auto mb-8" />
-      <div className="space-y-4">
-        <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4 mx-auto" />
-        <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/2 mx-auto" />
-      </div>
-    </div>
-  </div>
-)
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger)
+}
 
 export default function Home() {
   const { setActiveSection } = useUI()
 
-  // Optimized intersection observer
   useEffect(() => {
+    // Page entrance animation
+    pageTransitions.slideUp()
+
+    // Optimized intersection observer for section tracking
     const sections = document.querySelectorAll("section[id]")
 
     const observer = new IntersectionObserver(
@@ -49,59 +45,75 @@ export default function Home() {
     )
 
     sections.forEach((section) => observer.observe(section))
-    return () => observer.disconnect()
+
+    // Global scroll animations
+    gsap.utils.toArray(".fade-in-up").forEach((element: any) => {
+      gsap.fromTo(
+        element,
+        { opacity: 0, y: 50 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: element,
+            start: "top 80%",
+            once: true,
+          },
+        },
+      )
+    })
+
+    return () => {
+      observer.disconnect()
+      ScrollTrigger.getAll().forEach((trigger) => trigger.kill())
+    }
   }, [setActiveSection])
 
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        className="min-h-screen"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.3 }}
-      >
+    <div className="min-h-screen">
+      <ErrorBoundary>
+        <Navbar />
+      </ErrorBoundary>
+
+      <main id="main-content" role="main">
         <ErrorBoundary>
-          <Navbar />
+          <Hero />
         </ErrorBoundary>
 
-        <main id="main-content" role="main">
-          <ErrorBoundary>
-            <Hero />
-          </ErrorBoundary>
+        <ErrorBoundary>
+          <About />
+        </ErrorBoundary>
 
-          <ErrorBoundary>
-            <About />
-          </ErrorBoundary>
+        <ErrorBoundary>
+          <Skills />
+        </ErrorBoundary>
 
-          <ErrorBoundary>
-            <Skills />
-          </ErrorBoundary>
+        <ErrorBoundary>
+          <Timeline />
+        </ErrorBoundary>
 
-          <ErrorBoundary>
-            <Timeline />
-          </ErrorBoundary>
+        <ErrorBoundary>
+          <Projects />
+        </ErrorBoundary>
 
-          <ErrorBoundary>
-            <Projects />
-          </ErrorBoundary>
+        <ErrorBoundary>
+          <WritingShowcase />
+        </ErrorBoundary>
 
-          <ErrorBoundary>
-            <WritingShowcase />
-          </ErrorBoundary>
+        <ErrorBoundary>
+          <Testimonials />
+        </ErrorBoundary>
 
-          <ErrorBoundary>
-            <Testimonials />
-          </ErrorBoundary>
+        <ErrorBoundary>
+          <SimpleContact />
+        </ErrorBoundary>
 
-          <ErrorBoundary>
-            <SimpleContact />
-          </ErrorBoundary>
-
-          <ErrorBoundary>
-            <Footer />
-          </ErrorBoundary>
-        </main>
-      </motion.div>
-    </AnimatePresence>
+        <ErrorBoundary>
+          <Footer />
+        </ErrorBoundary>
+      </main>
+    </div>
   )
 }

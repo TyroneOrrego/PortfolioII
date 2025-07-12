@@ -1,11 +1,12 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { useState, useEffect, useRef } from "react"
+import { gsap } from "gsap"
 import { Button } from "@/components/ui/button"
 import { Menu, X, Sun, Moon, Monitor } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useTheme } from "@/contexts/theme-context"
+import { smoothScrollTo } from "@/lib/gsap-animations"
 
 const navigationItems = [
   { href: "#hero", label: "Home" },
@@ -24,7 +25,18 @@ export default function Navbar() {
   const [activeSection, setActiveSection] = useState("hero")
   const { theme, setTheme, isDarkMode } = useTheme()
 
+  const navRef = useRef<HTMLDivElement>(null)
+  const mobileMenuRef = useRef<HTMLDivElement>(null)
+  const backdropRef = useRef<HTMLDivElement>(null)
+
   useEffect(() => {
+    // Initial navbar animation
+    gsap.fromTo(
+      navRef.current,
+      { y: -100, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.8, ease: "power3.out", delay: 0.2 },
+    )
+
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20)
     }
@@ -55,11 +67,51 @@ export default function Navbar() {
     }
   }, [])
 
-  // Lock body scroll when mobile menu is open
+  // Mobile menu animations
   useEffect(() => {
     if (isMobileMenuOpen) {
+      // Open animation
+      gsap.set([backdropRef.current, mobileMenuRef.current], { display: "block" })
+
+      gsap.fromTo(backdropRef.current, { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" })
+
+      gsap.fromTo(mobileMenuRef.current, { x: "100%" }, { x: "0%", duration: 0.4, ease: "power3.out" })
+
+      // Animate menu items
+      gsap.fromTo(
+        ".mobile-nav-item",
+        { opacity: 0, x: 20 },
+        {
+          opacity: 1,
+          x: 0,
+          duration: 0.3,
+          stagger: 0.05,
+          delay: 0.2,
+          ease: "power2.out",
+        },
+      )
+
       document.body.style.overflow = "hidden"
     } else {
+      // Close animation
+      gsap.to(backdropRef.current, {
+        opacity: 0,
+        duration: 0.3,
+        ease: "power2.in",
+        onComplete: () => {
+          gsap.set(backdropRef.current, { display: "none" })
+        },
+      })
+
+      gsap.to(mobileMenuRef.current, {
+        x: "100%",
+        duration: 0.3,
+        ease: "power3.in",
+        onComplete: () => {
+          gsap.set(mobileMenuRef.current, { display: "none" })
+        },
+      })
+
       document.body.style.overflow = "unset"
     }
 
@@ -69,11 +121,8 @@ export default function Navbar() {
   }, [isMobileMenuOpen])
 
   const scrollToSection = (href: string) => {
-    const element = document.getElementById(href.substring(1))
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" })
-      setIsMobileMenuOpen(false)
-    }
+    smoothScrollTo(href.substring(1))
+    setIsMobileMenuOpen(false)
   }
 
   const getThemeIcon = () => {
@@ -96,25 +145,19 @@ export default function Navbar() {
 
   return (
     <>
-      <motion.nav
+      <nav
+        ref={navRef}
         className={cn(
           "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
           isScrolled
             ? "bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-lg border-b border-slate-200/50 dark:border-slate-700/50"
             : "bg-transparent",
         )}
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
       >
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <motion.div
-              className="font-bold text-xl text-slate-900 dark:text-white"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
+            <div className="font-bold text-xl text-slate-900 dark:text-white">
               <button
                 onClick={() => scrollToSection("#hero")}
                 className="hover:text-orange-500 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 rounded-md px-2 py-1"
@@ -122,12 +165,12 @@ export default function Navbar() {
               >
                 Tyrone Orrego
               </button>
-            </motion.div>
+            </div>
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center space-x-1">
               {navigationItems.map((item, index) => (
-                <motion.button
+                <button
                   key={item.href}
                   onClick={() => scrollToSection(item.href)}
                   className={cn(
@@ -136,23 +179,12 @@ export default function Navbar() {
                       ? "text-orange-500 bg-orange-50 dark:bg-orange-900/20"
                       : "text-slate-600 dark:text-slate-300 hover:text-orange-500 hover:bg-slate-50 dark:hover:bg-slate-800",
                   )}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.1 }}
                 >
                   {item.label}
                   {activeSection === item.href.substring(1) && (
-                    <motion.div
-                      className="absolute bottom-0 left-1/2 w-1 h-1 bg-orange-500 rounded-full"
-                      layoutId="activeIndicator"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      style={{ x: "-50%" }}
-                    />
+                    <div className="absolute bottom-0 left-1/2 w-1 h-1 bg-orange-500 rounded-full transform -translate-x-1/2" />
                   )}
-                </motion.button>
+                </button>
               ))}
             </div>
 
@@ -194,120 +226,80 @@ export default function Navbar() {
                 aria-label="Toggle mobile menu"
                 aria-expanded={isMobileMenuOpen}
               >
-                <AnimatePresence mode="wait">
-                  {isMobileMenuOpen ? (
-                    <motion.div
-                      key="close"
-                      initial={{ rotate: -90, opacity: 0 }}
-                      animate={{ rotate: 0, opacity: 1 }}
-                      exit={{ rotate: 90, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <X className="h-5 w-5" />
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="menu"
-                      initial={{ rotate: 90, opacity: 0 }}
-                      animate={{ rotate: 0, opacity: 1 }}
-                      exit={{ rotate: -90, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <Menu className="h-5 w-5" />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </Button>
             </div>
           </div>
         </div>
-      </motion.nav>
+      </nav>
 
       {/* Mobile Sidebar */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsMobileMenuOpen(false)}
-            />
+      <>
+        {/* Backdrop */}
+        <div
+          ref={backdropRef}
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+          style={{ display: "none" }}
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
 
-            {/* Sidebar */}
-            <motion.div
-              className="fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white dark:bg-slate-900 z-40 lg:hidden shadow-2xl border-l border-slate-200 dark:border-slate-700"
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            >
-              <div className="flex flex-col h-full">
-                {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-700">
-                  <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Navigation</h2>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="text-slate-600 dark:text-slate-300"
+        {/* Sidebar */}
+        <div
+          ref={mobileMenuRef}
+          className="fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white dark:bg-slate-900 z-40 lg:hidden shadow-2xl border-l border-slate-200 dark:border-slate-700"
+          style={{ display: "none" }}
+        >
+          <div className="flex flex-col h-full">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-700">
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Navigation</h2>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-slate-600 dark:text-slate-300"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+
+            {/* Navigation Items */}
+            <div className="flex-1 overflow-y-auto py-6">
+              <div className="space-y-2 px-6">
+                {navigationItems.map((item, index) => (
+                  <button
+                    key={item.href}
+                    onClick={() => scrollToSection(item.href)}
+                    className={cn(
+                      "mobile-nav-item flex items-center w-full text-left px-4 py-3 text-base font-medium rounded-xl transition-all duration-300 group",
+                      activeSection === item.href.substring(1)
+                        ? "text-orange-500 bg-orange-50 dark:bg-orange-900/20 shadow-sm"
+                        : "text-slate-600 dark:text-slate-300 hover:text-orange-500 hover:bg-slate-50 dark:hover:bg-slate-800",
+                    )}
                   >
-                    <X className="h-5 w-5" />
-                  </Button>
-                </div>
-
-                {/* Navigation Items */}
-                <div className="flex-1 overflow-y-auto py-6">
-                  <div className="space-y-2 px-6">
-                    {navigationItems.map((item, index) => (
-                      <motion.button
-                        key={item.href}
-                        onClick={() => scrollToSection(item.href)}
-                        className={cn(
-                          "flex items-center w-full text-left px-4 py-3 text-base font-medium rounded-xl transition-all duration-300 group",
-                          activeSection === item.href.substring(1)
-                            ? "text-orange-500 bg-orange-50 dark:bg-orange-900/20 shadow-sm"
-                            : "text-slate-600 dark:text-slate-300 hover:text-orange-500 hover:bg-slate-50 dark:hover:bg-slate-800",
-                        )}
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.3, delay: index * 0.05 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <span className="flex-1">{item.label}</span>
-                        {activeSection === item.href.substring(1) && (
-                          <motion.div
-                            className="w-2 h-2 bg-orange-500 rounded-full"
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            transition={{ duration: 0.2 }}
-                          />
-                        )}
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Footer */}
-                <div className="p-6 border-t border-slate-200 dark:border-slate-700 space-y-4">
-                  <Button
-                    onClick={() => scrollToSection("#contact")}
-                    className="w-full bg-orange-500 hover:bg-orange-600 text-white shadow-lg hover:shadow-xl transition-all duration-300"
-                  >
-                    Get in Touch
-                  </Button>
-
-                  <div className="text-center">
-                    <p className="text-xs text-slate-500 dark:text-slate-400">© 2024 Tyrone Orrego</p>
-                  </div>
-                </div>
+                    <span className="flex-1">{item.label}</span>
+                    {activeSection === item.href.substring(1) && <div className="w-2 h-2 bg-orange-500 rounded-full" />}
+                  </button>
+                ))}
               </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+            </div>
+
+            {/* Footer */}
+            <div className="p-6 border-t border-slate-200 dark:border-slate-700 space-y-4">
+              <Button
+                onClick={() => scrollToSection("#contact")}
+                className="w-full bg-orange-500 hover:bg-orange-600 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+              >
+                Get in Touch
+              </Button>
+
+              <div className="text-center">
+                <p className="text-xs text-slate-500 dark:text-slate-400">© 2024 Tyrone Orrego</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
     </>
   )
 }

@@ -1,54 +1,70 @@
 "use client"
 
-import { useRef, useState, useEffect, useCallback } from "react"
+import { useRef, useEffect } from "react"
+import { gsap } from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger)
+}
 
 interface UseScrollAnimationOptions {
   threshold?: number
   once?: boolean
   rootMargin?: string
+  start?: string
+  end?: string
 }
 
 export function useScrollAnimation({
   threshold = 0.1,
   once = true,
   rootMargin = "0px",
+  start = "top 80%",
+  end = "bottom 20%",
 }: UseScrollAnimationOptions = {}) {
   const ref = useRef<HTMLDivElement>(null)
-  const [isInView, setIsInView] = useState(false)
-  const observerRef = useRef<IntersectionObserver | null>(null)
-
-  const handleIntersection = useCallback(
-    (entries: IntersectionObserverEntry[]) => {
-      const [entry] = entries
-      if (entry.isIntersecting) {
-        setIsInView(true)
-        if (once && observerRef.current) {
-          observerRef.current.disconnect()
-        }
-      } else if (!once) {
-        setIsInView(false)
-      }
-    },
-    [once],
-  )
+  const isInView = useRef(false)
 
   useEffect(() => {
-    const currentRef = ref.current
-    if (!currentRef) return
+    const element = ref.current
+    if (!element) return
 
-    observerRef.current = new IntersectionObserver(handleIntersection, {
-      threshold,
-      rootMargin,
+    // Set initial state
+    gsap.set(element, { opacity: 0, y: 30 })
+
+    // Create scroll trigger
+    const trigger = ScrollTrigger.create({
+      trigger: element,
+      start,
+      end,
+      once,
+      onEnter: () => {
+        isInView.current = true
+        gsap.to(element, {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: "power2.out",
+        })
+      },
+      onLeave: () => {
+        if (!once) {
+          isInView.current = false
+          gsap.to(element, {
+            opacity: 0,
+            y: 30,
+            duration: 0.5,
+            ease: "power2.in",
+          })
+        }
+      },
     })
 
-    observerRef.current.observe(currentRef)
-
     return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect()
-      }
+      trigger.kill()
     }
-  }, [threshold, rootMargin, handleIntersection])
+  }, [once, start, end])
 
-  return { ref, isInView }
+  return { ref, isInView: isInView.current }
 }
