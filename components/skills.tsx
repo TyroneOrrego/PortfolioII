@@ -13,16 +13,158 @@ import {
   Workflow,
   GitBranch,
 } from "lucide-react"
-import { motion } from "framer-motion"
+import { useEffect, useRef } from "react"
+import { gsap } from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { useScrollAnimation } from "@/hooks/useScrollAnimation"
-import { useAnimations } from "@/lib/animations"
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger)
+}
 
 export default function Skills() {
-  const { ref: skillsRef, isInView: skillsInView } = useScrollAnimation({ threshold: 0.1 })
-  const { ref: toolsRef, isInView: toolsInView } = useScrollAnimation({ threshold: 0.1 })
-  const { fadeIn, fadeUp, staggerContainer } = useAnimations()
+  const sectionRef = useRef<HTMLDivElement>(null)
+  const headerRef = useRef<HTMLDivElement>(null)
+  const skillsRef = useRef<HTMLDivElement>(null)
+  const toolsRef = useRef<HTMLDivElement>(null)
+  const languagesRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Ensure all content is visible by default
+      gsap.set([headerRef.current, skillsRef.current, toolsRef.current, languagesRef.current], {
+        opacity: 1,
+        y: 0,
+      })
+
+      // Header animation
+      gsap.fromTo(
+        headerRef.current,
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 85%",
+            once: true,
+          },
+        },
+      )
+
+      // Skills section animation
+      gsap.fromTo(
+        skillsRef.current,
+        { opacity: 0, y: 40 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: skillsRef.current,
+            start: "top 85%",
+            once: true,
+          },
+        },
+      )
+
+      // Tools section animation
+      gsap.fromTo(
+        toolsRef.current,
+        { opacity: 0, y: 40 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: toolsRef.current,
+            start: "top 85%",
+            once: true,
+          },
+        },
+      )
+
+      // Languages section animation - with more lenient trigger
+      gsap.fromTo(
+        languagesRef.current,
+        { opacity: 0, y: 40 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: languagesRef.current,
+            start: "top 90%", // More lenient trigger for mobile
+            once: true,
+          },
+        },
+      )
+
+      // Stagger animations for skill cards
+      gsap.fromTo(
+        ".skill-card",
+        { opacity: 0, y: 20, scale: 0.95 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.6,
+          ease: "back.out(1.7)",
+          stagger: 0.1,
+          scrollTrigger: {
+            trigger: skillsRef.current,
+            start: "top 80%",
+            once: true,
+          },
+        },
+      )
+
+      // Stagger animations for tool items
+      gsap.fromTo(
+        ".tool-item",
+        { opacity: 0, scale: 0.8 },
+        {
+          opacity: 1,
+          scale: 1,
+          duration: 0.5,
+          ease: "back.out(1.7)",
+          stagger: 0.05,
+          scrollTrigger: {
+            trigger: toolsRef.current,
+            start: "top 80%",
+            once: true,
+          },
+        },
+      )
+
+      // Stagger animations for language cards
+      gsap.fromTo(
+        ".language-card",
+        { opacity: 0, y: 20, scale: 0.95 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.6,
+          ease: "back.out(1.7)",
+          stagger: 0.1,
+          scrollTrigger: {
+            trigger: languagesRef.current,
+            start: "top 85%", // More lenient for mobile
+            once: true,
+          },
+        },
+      )
+    }, sectionRef)
+
+    return () => ctx.revert()
+  }, [])
 
   // Technical skills with icons and descriptions
   const technicalSkills = [
@@ -97,124 +239,92 @@ export default function Skills() {
   ]
 
   return (
-    <section id="skills" className="py-16 md:py-24 bg-slate-50 dark:bg-slate-900">
+    <section id="skills" className="py-16 md:py-24 bg-slate-50 dark:bg-slate-900" ref={sectionRef}>
       <div className="container mx-auto px-4">
-        <motion.div
-          className="flex flex-col items-center mb-12"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.1 }}
-          variants={staggerContainer}
-        >
-          <motion.h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl mb-4" variants={fadeUp}>
-            Skills & Expertise
-          </motion.h2>
-          <motion.div className="h-1 w-20 bg-gray-800 rounded mb-8" variants={fadeIn}></motion.div>
-          <motion.p className="text-lg text-center max-w-3xl text-slate-700 dark:text-slate-300" variants={fadeUp}>
+        <div ref={headerRef} className="flex flex-col items-center mb-12">
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl mb-4">Skills & Expertise</h2>
+          <div className="h-1 w-20 bg-orange-500 rounded mb-8"></div>
+          <p className="text-lg text-center max-w-3xl text-slate-700 dark:text-slate-300">
             My diverse skill set allows me to create comprehensive documentation for various audiences and platforms.
-          </motion.p>
-        </motion.div>
+          </p>
+        </div>
 
-        <div className="grid md:grid-cols-2 gap-12">
+        <div className="space-y-16">
           {/* Technical Skills Section */}
           <div ref={skillsRef}>
-            <motion.h3
-              className="text-2xl font-bold mb-6"
-              initial={{ opacity: 0, y: 20 }}
-              animate={skillsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.5 }}
-            >
-              Technical Skills
-            </motion.h3>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <h3 className="text-2xl font-bold mb-6 text-center md:text-left">Technical Skills</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {technicalSkills.map((skill, index) => (
-                <motion.div
-                  key={skill.name}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={skillsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                  transition={{ duration: 0.5, delay: 0.1 * index }}
-                  whileHover={{ y: -5, transition: { duration: 0.2 } }}
-                >
-                  <Card className="h-full border border-slate-200 dark:border-slate-700 hover:shadow-md transition-shadow">
+                <div key={skill.name} className="skill-card">
+                  <Card className="h-full border border-slate-200 dark:border-slate-700 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                     <CardContent className="p-4">
                       <div className="flex items-start gap-3">
-                        <div className="p-2 rounded-full bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">
+                        <div className="p-2 rounded-full bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400 flex-shrink-0">
                           <skill.icon className="h-5 w-5" />
                         </div>
                         <div>
-                          <h4 className="font-semibold text-base">{skill.name}</h4>
-                          <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{skill.description}</p>
+                          <h4 className="font-semibold text-base mb-1">{skill.name}</h4>
+                          <p className="text-sm text-slate-600 dark:text-slate-400">{skill.description}</p>
                         </div>
                       </div>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>
 
+          {/* Tools & Technologies Section */}
           <div ref={toolsRef}>
-            {/* Tools & Technologies Section */}
-            <motion.h3
-              className="text-2xl font-bold mb-6"
-              initial={{ opacity: 0, y: 20 }}
-              animate={toolsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.5 }}
-            >
-              Tools & Technologies
-            </motion.h3>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-10">
+            <h3 className="text-2xl font-bold mb-6 text-center md:text-left">Tools & Technologies</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
               {tools.map((tool, index) => (
-                <motion.div
-                  key={tool.name}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={toolsInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.4, delay: 0.05 * index }}
-                  whileHover={{ y: -3, transition: { duration: 0.2 } }}
-                  className="flex items-center gap-2 bg-white dark:bg-slate-800 p-3 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700"
-                >
-                  <tool.icon className="h-4 w-4 text-gray-700 dark:text-gray-300" />
-                  <span className="text-sm">{tool.name}</span>
-                </motion.div>
+                <div key={tool.name} className="tool-item">
+                  <div className="flex items-center gap-2 bg-white dark:bg-slate-800 p-3 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md hover:border-orange-200 dark:hover:border-orange-700 transition-all duration-300">
+                    <tool.icon className="h-4 w-4 text-orange-600 dark:text-orange-400 flex-shrink-0" />
+                    <span className="text-sm font-medium">{tool.name}</span>
+                  </div>
+                </div>
               ))}
             </div>
+          </div>
 
-            {/* Languages Section */}
-            <motion.h3
-              className="text-2xl font-bold mb-6"
-              initial={{ opacity: 0, y: 20 }}
-              animate={toolsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-            >
-              Languages
-            </motion.h3>
-
-            <div className="space-y-4">
+          {/* Languages Section - Fixed for mobile */}
+          <div ref={languagesRef} className="w-full">
+            <h3 className="text-2xl font-bold mb-6 text-center md:text-left">Languages</h3>
+            <div className="space-y-4 max-w-2xl mx-auto md:mx-0">
               {languages.map((lang, index) => (
-                <motion.div
-                  key={lang.language}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={toolsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                  transition={{ duration: 0.5, delay: 0.4 + 0.1 * index }}
-                  whileHover={{ y: -3, transition: { duration: 0.2 } }}
-                >
-                  <Card className="border border-slate-200 dark:border-slate-700 hover:shadow-md transition-shadow">
+                <div key={lang.language} className="language-card w-full">
+                  <Card className="border border-slate-200 dark:border-slate-700 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <lang.icon className="h-5 w-5 text-gray-700 dark:text-gray-300" />
-                          <h4 className="font-semibold">{lang.language}</h4>
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 rounded-full bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400">
+                            <lang.icon className="h-5 w-5" />
+                          </div>
+                          <h4 className="font-semibold text-lg">{lang.language}</h4>
                         </div>
-                        <Badge variant="secondary" className="font-medium">
+                        <Badge
+                          variant="secondary"
+                          className="font-medium bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300"
+                        >
                           {lang.level}
                         </Badge>
                       </div>
-                      <p className="text-sm text-slate-600 dark:text-slate-400">{lang.description}</p>
+                      <p className="text-sm text-slate-600 dark:text-slate-400 ml-11">{lang.description}</p>
+
+                      {/* Progress bar for visual representation */}
+                      <div className="mt-3 ml-11">
+                        <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+                          <div
+                            className="bg-gradient-to-r from-orange-400 to-orange-600 h-2 rounded-full transition-all duration-1000"
+                            style={{ width: `${lang.proficiency}%` }}
+                          />
+                        </div>
+                      </div>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>

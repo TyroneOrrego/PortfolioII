@@ -20,7 +20,7 @@ export function useScrollAnimation({
   threshold = 0.1,
   once = true,
   rootMargin = "0px",
-  start = "top 80%",
+  start = "top 85%", // More lenient default for mobile
   end = "bottom 20%",
 }: UseScrollAnimationOptions = {}) {
   const ref = useRef<HTMLDivElement>(null)
@@ -30,10 +30,10 @@ export function useScrollAnimation({
     const element = ref.current
     if (!element) return
 
-    // Set initial state
-    gsap.set(element, { opacity: 0, y: 30 })
+    // Ensure element is visible by default
+    gsap.set(element, { opacity: 1, y: 0 })
 
-    // Create scroll trigger
+    // Create scroll trigger with mobile-friendly settings
     const trigger = ScrollTrigger.create({
       trigger: element,
       start,
@@ -41,24 +41,25 @@ export function useScrollAnimation({
       once,
       onEnter: () => {
         isInView.current = true
-        gsap.to(element, {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          ease: "power2.out",
-        })
+        gsap.fromTo(
+          element,
+          { opacity: 0, y: 30 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power2.out",
+          },
+        )
       },
       onLeave: () => {
         if (!once) {
           isInView.current = false
-          gsap.to(element, {
-            opacity: 0,
-            y: 30,
-            duration: 0.5,
-            ease: "power2.in",
-          })
         }
       },
+      // Add mobile-specific settings
+      refreshPriority: -1,
+      invalidateOnRefresh: true,
     })
 
     return () => {
