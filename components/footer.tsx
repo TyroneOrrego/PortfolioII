@@ -32,9 +32,24 @@ export default function Footer() {
   ]
 
   const contactInfo = [
-    { icon: Mail, label: "steven.orrego93@gmail.com", href: "steven.orrego93@gmail.com" },
-    { icon: Phone, label: "+57 3024374193", href: "tel:+573024374193" },
-    { icon: MapPin, label: "Remote Available", href: null },
+    {
+      icon: Mail,
+      label: "steven.orrego93@gmail.com",
+      href: "mailto:steven.orrego93@gmail.com",
+      type: "email",
+    },
+    {
+      icon: Phone,
+      label: "+57 3024374193",
+      href: "tel:+573024374193",
+      type: "phone",
+    },
+    {
+      icon: MapPin,
+      label: "Remote Available",
+      href: null,
+      type: "location",
+    },
   ]
 
   const socialLinks = [
@@ -66,7 +81,7 @@ export default function Footer() {
                     asChild
                     variant="outline"
                     size="icon"
-                    className="border-slate-700 text-slate-400 hover:text-white hover:border-orange-500 hover:bg-orange-500/10"
+                    className="border-slate-700 text-slate-400 hover:text-white hover:border-orange-500 hover:bg-orange-500/10 bg-transparent"
                   >
                     <Link href={social.href} target="_blank" rel="noopener noreferrer" aria-label={social.label}>
                       <social.icon className="h-4 w-4" />
@@ -125,7 +140,7 @@ export default function Footer() {
             </motion.div>
           </div>
 
-          {/* Contact Info */}
+          {/* Contact Info - Fixed Alignment */}
           <div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -134,20 +149,24 @@ export default function Footer() {
               viewport={{ once: true }}
             >
               <h4 className="text-lg font-semibold mb-4">Contact</h4>
-              <ul className="space-y-3">
+              <ul className="space-y-4">
                 {contactInfo.map((contact) => (
-                  <li key={contact.label} className="flex items-center space-x-3">
-                    <contact.icon className="h-4 w-4 text-orange-400 flex-shrink-0" />
-                    {contact.href ? (
-                      <Link
-                        href={contact.href}
-                        className="text-slate-400 hover:text-orange-400 transition-colors text-sm"
-                      >
-                        {contact.label}
-                      </Link>
-                    ) : (
-                      <span className="text-slate-400 text-sm">{contact.label}</span>
-                    )}
+                  <li key={contact.label} className="flex items-start space-x-3">
+                    <div className="flex-shrink-0 w-5 h-5 mt-0.5">
+                      <contact.icon className="h-4 w-4 text-orange-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      {contact.href ? (
+                        <Link
+                          href={contact.href}
+                          className="text-slate-400 hover:text-orange-400 transition-colors text-sm break-words"
+                        >
+                          {contact.label}
+                        </Link>
+                      ) : (
+                        <span className="text-slate-400 text-sm">{contact.label}</span>
+                      )}
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -158,7 +177,7 @@ export default function Footer() {
                   asChild
                   variant="outline"
                   size="sm"
-                  className="border-orange-500 text-orange-400 hover:bg-orange-500 hover:text-white"
+                  className="border-orange-500 text-orange-400 hover:bg-orange-500 hover:text-white bg-transparent"
                 >
                   <Link
                     href="https://drive.google.com/file/d/1F6Zx1itVkHY13vDWXkTMKst3J5VWsX04/view?usp=drive_link"
@@ -222,7 +241,7 @@ export default function Footer() {
               onClick={scrollToTop}
               variant="outline"
               size="icon"
-              className="border-slate-700 text-slate-400 hover:text-white hover:border-orange-500 hover:bg-orange-500/10"
+              className="border-slate-700 text-slate-400 hover:text-white hover:border-orange-500 hover:bg-orange-500/10 bg-transparent"
               aria-label="Scroll to top"
             >
               <ArrowUp className="h-4 w-4" />

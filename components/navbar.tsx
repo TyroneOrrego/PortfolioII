@@ -73,6 +73,9 @@ export default function Navbar() {
       // Open animation
       gsap.set([backdropRef.current, mobileMenuRef.current], { display: "block" })
 
+      // Reset transform
+      gsap.set(mobileMenuRef.current, { x: "100%" })
+
       gsap.fromTo(backdropRef.current, { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" })
 
       gsap.fromTo(mobileMenuRef.current, { x: "100%" }, { x: "0%", duration: 0.4, ease: "power3.out" })
@@ -246,46 +249,56 @@ export default function Navbar() {
         {/* Sidebar */}
         <div
           ref={mobileMenuRef}
-          className="fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white dark:bg-slate-900 z-40 lg:hidden shadow-2xl border-l border-slate-200 dark:border-slate-700"
-          style={{ display: "none" }}
+          className="fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white dark:bg-slate-900 z-50 lg:hidden shadow-2xl border-l border-slate-200 dark:border-slate-700 overflow-hidden"
+          style={{ display: "none", transform: "translateX(100%)" }}
         >
           <div className="flex flex-col h-full">
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-700">
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Navigation</h2>
+            <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">T</span>
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Tyrone Orrego</h2>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Navigation</p>
+                </div>
+              </div>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="text-slate-600 dark:text-slate-300"
+                className="text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
               >
                 <X className="h-5 w-5" />
               </Button>
             </div>
 
             {/* Navigation Items */}
-            <div className="flex-1 overflow-y-auto py-6">
-              <div className="space-y-2 px-6">
+            <div className="flex-1 overflow-y-auto py-4">
+              <div className="space-y-1 px-4">
                 {navigationItems.map((item, index) => (
                   <button
                     key={item.href}
                     onClick={() => scrollToSection(item.href)}
                     className={cn(
-                      "mobile-nav-item flex items-center w-full text-left px-4 py-3 text-base font-medium rounded-xl transition-all duration-300 group",
+                      "mobile-nav-item flex items-center justify-between w-full text-left px-4 py-3 text-base font-medium rounded-xl transition-all duration-300 group",
                       activeSection === item.href.substring(1)
-                        ? "text-orange-500 bg-orange-50 dark:bg-orange-900/20 shadow-sm"
-                        : "text-slate-600 dark:text-slate-300 hover:text-orange-500 hover:bg-slate-50 dark:hover:bg-slate-800",
+                        ? "text-orange-500 bg-orange-50 dark:bg-orange-900/20 shadow-sm border border-orange-200 dark:border-orange-800"
+                        : "text-slate-600 dark:text-slate-300 hover:text-orange-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border hover:border-slate-200 dark:hover:border-slate-700",
                     )}
                   >
                     <span className="flex-1">{item.label}</span>
-                    {activeSection === item.href.substring(1) && <div className="w-2 h-2 bg-orange-500 rounded-full" />}
+                    {activeSection === item.href.substring(1) && (
+                      <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse" />
+                    )}
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Footer */}
-            <div className="p-6 border-t border-slate-200 dark:border-slate-700 space-y-4">
+            <div className="p-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 space-y-4">
               <Button
                 onClick={() => scrollToSection("#contact")}
                 className="w-full bg-orange-500 hover:bg-orange-600 text-white shadow-lg hover:shadow-xl transition-all duration-300"
@@ -294,7 +307,7 @@ export default function Navbar() {
               </Button>
 
               <div className="text-center">
-                <p className="text-xs text-slate-500 dark:text-slate-400">© 2024 Tyrone Orrego</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">© 2025 Tyrone Orrego • Technical Writer</p>
               </div>
             </div>
           </div>
