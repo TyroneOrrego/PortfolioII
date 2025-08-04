@@ -180,7 +180,7 @@ export default function Footer() {
                   className="border-orange-500 text-orange-400 hover:bg-orange-500 hover:text-white bg-transparent"
                 >
                   <Link
-                    href="https://drive.google.com/file/d/1F6Zx1itVkHY13vDWXkTMKst3J5VWsX04/view?usp=drive_link"
+                    href="https://drive.google.com/file/d/1EoijV_Oi8M2zStv9_mfgk5tjX7q_jFsa/view?usp=sharing"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center space-x-2"

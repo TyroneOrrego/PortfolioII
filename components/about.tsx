@@ -220,7 +220,7 @@ export default function About() {
                 className="border-orange-200 text-orange-700 hover:bg-orange-50 dark:border-orange-800 dark:text-orange-400 dark:hover:bg-orange-900/20"
               >
                 <Link
-                  href="https://drive.google.com/file/d/1F6Zx1itVkHY13vDWXkTMKst3J5VWsX04/view?usp=drive_link"
+                  href="https://drive.google.com/file/d/1EoijV_Oi8M2zStv9_mfgk5tjX7q_jFsa/view?usp=sharing"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center space-x-2"
